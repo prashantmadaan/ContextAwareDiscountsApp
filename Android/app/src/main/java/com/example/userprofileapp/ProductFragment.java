@@ -45,7 +45,7 @@ public class ProductFragment extends Fragment implements ProductAdapter.prodInte
     private RecyclerView.LayoutManager layoutManager;
     List<Product> productList = new ArrayList<>();
     List<Product> selectedProducts = new ArrayList<>();
-    String productURL = "http://172.20.4.157:3000/contextawareproducts";
+    String productURL = "http://ec2-34-226-248-9.compute-1.amazonaws.com:3000/contextawareproducts";
     static String token;
     int product_added =0;
     private BeaconManager beaconManager;
@@ -130,6 +130,7 @@ public class ProductFragment extends Fragment implements ProductAdapter.prodInte
         beaconManager.setBackgroundScanPeriod(30000L,30000L);
 // add this below:
         beaconManager.setRangingListener(new BeaconManager.BeaconRangingListener() {
+
             @Override
             public void onBeaconsDiscovered(BeaconRegion region, List<Beacon> list) {
                 if (!list.isEmpty()) {
@@ -142,8 +143,11 @@ public class ProductFragment extends Fragment implements ProductAdapter.prodInte
                         e.printStackTrace();
                     }
                     Log.d("pm", "Nearest products: " + productList);
+                }else{
+                    Log.d("pm","No beacon found");
                 }
             }
+
         });
 
 

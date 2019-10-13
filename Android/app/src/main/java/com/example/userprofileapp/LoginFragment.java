@@ -32,7 +32,7 @@ public class LoginFragment extends Fragment {
     View myFragment;
     EditText email;
     EditText password;
-    String LoginUserURL="http://localhost:3000/signin";
+    String LoginUserURL="http://ec2-34-226-248-9.compute-1.amazonaws.com:3000/signin";
     String authToken;
     SharedPreferences sharedPreferences;
     //static User user;

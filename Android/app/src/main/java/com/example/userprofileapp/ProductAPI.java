@@ -20,6 +20,8 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import androidx.fragment.app.FragmentActivity;
@@ -115,7 +117,14 @@ public class ProductAPI {
                         @Override
                         public void handleMessage(Message msg) {
                             // Any UI task, example
+                            prod_list.clear();
                             prod_list.addAll(products);
+                            Collections.sort(prod_list, new Comparator<Product>() {
+                                @Override
+                                public int compare(Product product, Product t1) {
+                                    return product.getCategory().compareTo(t1.getCategory());
+                                }
+                            });
                             //Log.d("chella","Product List on parsing the JSON "+prod_list);
                             prodAdapters.notifyDataSetChanged();
                         }
