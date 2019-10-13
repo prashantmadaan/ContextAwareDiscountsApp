@@ -53,20 +53,20 @@ db.once('open', function callback() {
 
 
 
-/* fs.readFile('./supportFiles/discount.json', 'utf8', function (err, data) {
-     if (err) throw err;
-    var json = JSON.parse(data);
-   //  console.log(json.results);
- db.on('open', function () {
-     db.db.listCollections().toArray(function (err, collectionNames) {
-         if (err) {
-             console.log(err);
-             return;
-         }
-         console.log(collectionNames);
-      /*   collectionNames.forEach(collectionNames,function(item){
-             console.log(collectionNames[item].name);
-         })*/
+// fs.readFile('./supportFiles/discount.json', 'utf8', function (err, data) {
+//     if (err) throw err;
+//    var json = JSON.parse(data);
+//   //  console.log(json.results);
+// db.on('open', function () {
+//     db.db.listCollections().toArray(function (err, collectionNames) {
+//         if (err) {
+//             console.log(err);
+//             return;
+//         }
+//         console.log(collectionNames);
+////         collectionNames.forEach(collectionNames,function(item){
+////             console.log(collectionNames[item].name);
+////         })
 //           db.db.createCollection("products", function (err, res) {
 //                 if (err) throw err;
 //                 console.log("Collection created!");
@@ -80,9 +80,9 @@ db.once('open', function callback() {
 //     });});
 //
 //     });
-
-
- //});
+//
+//
+// });
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

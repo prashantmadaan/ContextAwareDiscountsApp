@@ -52,4 +52,13 @@ dependencies {
     implementation 'com.braintreepayments.api:drop-in:4.1.1'
 
 
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    // compile 'com.android.support:appcompat-v7:23.0.1'
+
+    // add the following line, and replace "1.0.12" with the latest version
+    // of Estimote Android SDK; you'll find the latest version number on:
+    //   https://github.com/Estimote/Android-SDK/releases
+    compile 'com.estimote:sdk:1.0.12'
+
+
 }

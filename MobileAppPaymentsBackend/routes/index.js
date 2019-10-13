@@ -8,7 +8,7 @@ var Task = require('../models/userProfileAPIModels');
 var mongoose = require('mongoose');
 var Login = mongoose.model('login');
 var Users = mongoose.model('user');
-var products= mongoose.model('products');
+var products = mongoose.model('products');
 
 const jwt = require('jsonwebtoken');
 var braintree_id;
@@ -82,11 +82,13 @@ router.get('/checkouts/new', function (req, res) {
                 res.send(403);
                 console.log("forbidden from validate");
             } else {
-                gateway.clientToken.generate({customerId:authData.braintree_id}, function (err, response) {
-                // res.render('checkouts/new', {clientToken: response.clientToken, messages: req.flash('error')});
-                console.log("hit the checkouts new");
-                res.send(JSON.stringify(response)); // Instead of render a view, we just return an json object for the API
-            });
+                gateway.clientToken.generate({
+                    customerId: authData.braintree_id
+                }, function (err, response) {
+                    // res.render('checkouts/new', {clientToken: response.clientToken, messages: req.flash('error')});
+                    console.log("hit the checkouts new");
+                    res.send(JSON.stringify(response)); // Instead of render a view, we just return an json object for the API
+                });
             }
         });
     } else {
@@ -114,10 +116,10 @@ router.post('/checkouts', function (req, res) {
     var amount = req.body.amount; // In production you should not take amounts directly from clients
     var nonce = req.body.payment_method_nonce;
 
-    console.log("amount in gateway",amount);
+    console.log("amount in gateway", amount);
 
-    const bearerHeader =  req.headers['authorization'];
-    console.log("bearerHeader: "+bearerHeader);
+    const bearerHeader = req.headers['authorization'];
+    console.log("bearerHeader: " + bearerHeader);
 
     if (typeof bearerHeader !== "undefined") {
         const bearer = bearerHeader.split(" ");
@@ -125,36 +127,35 @@ router.post('/checkouts', function (req, res) {
         req.token = bearer_token;
         console.log("Inside Bearer");
 
-      jwt.verify(req.token, 'secretkey', (err, authData) => {
-        if (err) {
-            res.send(403);
-            console.log("forbidden from validate");
-        } else {
-          gateway.transaction.sale({
-              amount: amount,
-              paymentMethodNonce: nonce,
-              options: {
-                  submitForSettlement: true
-              }
-          }, function (err, result) {
-              if (result.success || result.transaction) {
-                  // res.redirect('checkouts/' + result.transaction.id);
-                  res.send(result);
-              } else {
-                  console.log("error in checkouts",err);
-                  transactionErrors = result.errors.deepErrors();
-                  //  req.flash('error', {msg: formatErrors(transactionErrors)});
-                  // res.redirect('checkouts/new');
-                  res.send(formatErrors(transactionErrors));
-              }
-          });
-        }
-      })
+        jwt.verify(req.token, 'secretkey', (err, authData) => {
+            if (err) {
+                res.send(403);
+                console.log("forbidden from validate");
+            } else {
+                gateway.transaction.sale({
+                    amount: amount,
+                    paymentMethodNonce: nonce,
+                    options: {
+                        submitForSettlement: true
+                    }
+                }, function (err, result) {
+                    if (result.success || result.transaction) {
+                        // res.redirect('checkouts/' + result.transaction.id);
+                        res.send(result);
+                    } else {
+                        console.log("error in checkouts", err);
+                        transactionErrors = result.errors.deepErrors();
+                        //  req.flash('error', {msg: formatErrors(transactionErrors)});
+                        // res.redirect('checkouts/new');
+                        res.send(formatErrors(transactionErrors));
+                    }
+                });
+            }
+        })
 
-    }
-    else {
-      console.log("Bearer header undefined in else");
-      res.send("Bearer not correct");
+    } else {
+        console.log("Bearer header undefined in else");
+        res.send("Bearer not correct");
     }
 });
 
@@ -247,7 +248,7 @@ router.post('/signin', function (req, res) {
     }, function (error, comments) {
         const response = {};
         var tok = 0;
-       // var user_brain_id;
+        // var user_brain_id;
         if (comments.length) {
             if (comments[0].password === req.body.password) {
                 Users.find({
@@ -263,12 +264,12 @@ router.post('/signin', function (req, res) {
                         console.log(user_brain_id);
                         jwt.sign({
                             email: email_req,
-                            braintree_id:user_brain_id
+                            braintree_id: user_brain_id
                         }, "secretkey", (err, token) => {
                             response.status = "Success";
                             response.message = "User Sucessfully logged In";
                             response.token = token;
-                            response.first_name=user.first_name;
+                            response.first_name = user.first_name;
                             console.log(response);
                             res.send(response);
                         });
@@ -415,47 +416,157 @@ function updateuserProfile(user, req, res) {
     });
 }
 
+router.get('/contextawareproducts', function (req, res) {
+    var response = {};
+    //var productList={};
+    const bearerHeader = req.headers['authorization'];
+    console.log("bearerHeader: " + bearerHeader);
 
-router.get('/products',function(req,res){
-   var response={};
-   //var productList={};
-   const bearerHeader =  req.headers['authorization'];
-   console.log("bearerHeader: "+bearerHeader);
+    if (typeof bearerHeader !== "undefined") {
+        const bearer = bearerHeader.split(" ");
+        const bearer_token = bearer[1];
+        req.token = bearer_token;
+        console.log("Inside Bearer");
 
-   if (typeof bearerHeader !== "undefined") {
-       const bearer = bearerHeader.split(" ");
-       const bearer_token = bearer[1];
-       req.token = bearer_token;
-       console.log("Inside Bearer");
+        jwt.verify(req.token, 'secretkey', (err, authData) => {
+            if (err) {
+                res.send(403);
+                console.log("forbidden from validate");
+            } else {
+                var major = req.headers['major'];
+                var minor = req.headers['minor'];
+                console.log("major:minor",major+" :",minor)
 
-     jwt.verify(req.token, 'secretkey', (err, authData) => {
-       if (err) {
-           res.send(403);
-           console.log("forbidden from validate");
-       } else {
-       products.find({},function(err,items){
-           //console.log(items);
-      // productList.push(items);
+                if (major + ":" + minor == "30462:43265") {
+                    console.log("Inside firs majrr")
+                    products.find({
+                            region: "grocery"
+                        }, function (err, items) {
+                            //console.log(items);
+                            // productList.push(items);
 
-        if(items.length>0){
-        response.status=200;
-        response.message="products sent successfully";
-        response.data=items;
-        res.send(response);
+                            if (items.length > 0) {
+                                response.status = 200;
+                                response.message = "products sent successfully";
+                                response.data = items;
+                                res.send(response);
 
-    }else{
-        response.status = 402;
-        response.message = "product list empty";
-        res.send(response);
+                            } else {
+                                response.status = 402;
+                                response.message = "product list empty";
+                                res.send(response);
+                            }
+                        });
+                                  }
+                    else if(major + ":" + minor == "26535:44799") {
+                        products.find({
+                                region: "produce"
+                            }, function (err, items) {
+                                //console.log(items);
+                                // productList.push(items);
+
+                                if (items.length > 0) {
+                                    response.status = 200;
+                                    response.message = "products sent successfully";
+                                    response.data = items;
+                                    res.send(response);
+
+                                } else {
+                                    response.status = 402;
+                                    response.message = "product list empty";
+                                    res.send(response);
+                                }
+                            });
+
+                        }
+                        else if(major + ":" + minor == "15212:31506") {
+
+                            products.find({
+                                    region: "lifestyle"
+                                }, function (err, items) {
+                                    //console.log(items);
+                                    // productList.push(items);
+
+                                    if (items.length > 0) {
+                                        response.status = 200;
+                                        response.message = "products sent successfully";
+                                        response.data = items;
+                                        res.send(response);
+
+                                    } else {
+                                        response.status = 402;
+                                        response.message = "product list empty";
+                                        res.send(response);
+                                    }
+                                });
+                            }
+                            else {
+                                products.find({}, function (err, items) {
+                                        //console.log(items);
+                                        // productList.push(items);
+
+                                        if (items.length > 0) {
+                                            response.status = 200;
+                                            response.message = "products sent successfully";
+                                            response.data = items;
+                                            res.send(response);
+
+                                        } else {
+                                            response.status = 402;
+                                            response.message = "product list empty";
+                                            res.send(response);
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                );
+    } else {
+        console.log("Failed here");
+        res.sendStatus(403);
     }
-   });
- }
-})
-}
-else{
-  console.log("Failed here");
-  res.sendStatus(403);
-}
+});
+
+
+router.get('/products', function (req, res) {
+    var response = {};
+    //var productList={};
+    const bearerHeader = req.headers['authorization'];
+    console.log("bearerHeader: " + bearerHeader);
+
+    if (typeof bearerHeader !== "undefined") {
+        const bearer = bearerHeader.split(" ");
+        const bearer_token = bearer[1];
+        req.token = bearer_token;
+        console.log("Inside Bearer");
+
+        jwt.verify(req.token, 'secretkey', (err, authData) => {
+            if (err) {
+                res.send(403);
+                console.log("forbidden from validate");
+            } else {
+                products.find({}, function (err, items) {
+                    //console.log(items);
+                    // productList.push(items);
+
+                    if (items.length > 0) {
+                        response.status = 200;
+                        response.message = "products sent successfully";
+                        response.data = items;
+                        res.send(response);
+
+                    } else {
+                        response.status = 402;
+                        response.message = "product list empty";
+                        res.send(response);
+                    }
+                });
+            }
+        })
+    } else {
+        console.log("Failed here");
+        res.sendStatus(403);
+    }
 });
 
 

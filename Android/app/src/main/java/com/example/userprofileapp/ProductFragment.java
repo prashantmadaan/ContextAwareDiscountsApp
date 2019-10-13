@@ -19,13 +19,20 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.estimote.coresdk.common.requirements.SystemRequirementsChecker;
+import com.estimote.coresdk.observation.region.beacon.BeaconRegion;
+import com.estimote.coresdk.recognition.packets.Beacon;
+import com.estimote.coresdk.service.BeaconManager;
 import com.example.userprofileapp.pojo.Product;
 import com.example.userprofileapp.pojo.User;
 import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
+
 //implements ProductAdapter.prodInterface
 public class ProductFragment extends Fragment implements ProductAdapter.prodInterface  {
 
@@ -38,9 +45,11 @@ public class ProductFragment extends Fragment implements ProductAdapter.prodInte
     private RecyclerView.LayoutManager layoutManager;
     List<Product> productList = new ArrayList<>();
     List<Product> selectedProducts = new ArrayList<>();
-    String productURL = "http://192.168.118.2:3000/products";
+    String productURL = "http://172.20.4.157:3000/contextawareproducts";
     static String token;
     int product_added =0;
+    private BeaconManager beaconManager;
+    private BeaconRegion region;
     //static User User;
     SharedPreferences sharedPreferences;
 //    SharedPreferences.Editor editor;
@@ -112,8 +121,34 @@ public class ProductFragment extends Fragment implements ProductAdapter.prodInte
         prodRecyclerView.setAdapter(prodAdapter);
         //prodAdapter.notifyDataSetChanged();
 
+        // Start with beacons
+        beaconManager = new BeaconManager(getActivity());
+        region = new BeaconRegion("ranged region",
+                UUID.fromString("B9407F30-F5F8-466E-AFF9-25556B57FE6D"), null, null);
+
+        beaconManager = new BeaconManager(getActivity());
+        beaconManager.setBackgroundScanPeriod(30000L,30000L);
+// add this below:
+        beaconManager.setRangingListener(new BeaconManager.BeaconRangingListener() {
+            @Override
+            public void onBeaconsDiscovered(BeaconRegion region, List<Beacon> list) {
+                if (!list.isEmpty()) {
+                    Beacon nearestBeacon = list.get(0);
+                    Log.d("pm","Beacon major and minor"+ nearestBeacon.getMajor()+" "+nearestBeacon.getMinor());
+                    try {
+                        new ProductAPI(productURL,getActivity(),prodAdapter,productList,token,nearestBeacon.getMajor(),nearestBeacon.getMinor()).execute();
+                        //   prodAdapter.notifyDataSetChanged();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    Log.d("pm", "Nearest products: " + productList);
+                }
+            }
+        });
+
+
         try {
-            new ProductAPI(productURL,getActivity(),prodAdapter,productList,token).execute();
+            new ProductAPI(productURL,getActivity(),prodAdapter,productList,token,-1,-1).execute();
          //   prodAdapter.notifyDataSetChanged();
         } catch (IOException e) {
             e.printStackTrace();
@@ -163,6 +198,27 @@ public class ProductFragment extends Fragment implements ProductAdapter.prodInte
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        SystemRequirementsChecker.checkWithDefaultDialogs(getActivity());
+
+        beaconManager.connect(new BeaconManager.ServiceReadyCallback() {
+            @Override
+            public void onServiceReady() {
+                beaconManager.startRanging(region);
+            }
+        });
+    }
+
+    @Override
+    public void onPause() {
+        beaconManager.stopRanging(region);
+
+        super.onPause();
     }
 
     @Override
