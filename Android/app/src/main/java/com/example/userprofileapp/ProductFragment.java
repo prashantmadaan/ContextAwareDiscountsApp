@@ -28,6 +28,7 @@ import com.example.userprofileapp.pojo.Product;
 import com.example.userprofileapp.pojo.User;
 import com.google.gson.Gson;
 
+import java.io.Console;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -132,7 +133,7 @@ public class ProductFragment extends Fragment implements ProductAdapter.prodInte
                 UUID.fromString("B9407F30-F5F8-466E-AFF9-25556B57FE6D"), null, null);
 
         beaconManager = new BeaconManager(getActivity());
-        beaconManager.setBackgroundScanPeriod(30000L,30000L);
+     //   beaconManager.setBackgroundScanPeriod(30000L,30000L);
 
 //        beaconManager.connect(new BeaconManager.ServiceReadyCallback() {
 //            @Override
@@ -170,6 +171,8 @@ public class ProductFragment extends Fragment implements ProductAdapter.prodInte
                     }
                     else{
                         nearestBeacon = list.get(0);
+                        if(nearestBeacon.getRssi()>-82){
+
                         Log.d("pm","Beacon major and minor"+ nearestBeacon.getMajor()+" "+nearestBeacon.getMinor());
                         try {
                             new ProductAPI(productURL,getActivity(),prodAdapter,productList,token,nearestBeacon.getMajor(),nearestBeacon.getMinor()).execute();
@@ -178,7 +181,18 @@ public class ProductFragment extends Fragment implements ProductAdapter.prodInte
                             e.printStackTrace();
                         }
                         Log.d("pm", "Nearest products: " + productList);
+                        Log.d("Rg_check","beacon power high"+ String.valueOf(nearestBeacon.getRssi()));
                         currentbeacon= new BeaconPojo(nearestBeacon.getMajor(),nearestBeacon.getMinor(), Calendar.getInstance().getTimeInMillis());
+                    }else{
+                            try {
+                                new ProductAPI(productURL,getActivity(),prodAdapter,productList,token,-1,-1).execute();
+                                //   prodAdapter.notifyDataSetChanged();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                             Log.d("Rg_check","beacon power low"+ String.valueOf(nearestBeacon.getRssi()));
+
+                        }
                     }
 
                 }else{
