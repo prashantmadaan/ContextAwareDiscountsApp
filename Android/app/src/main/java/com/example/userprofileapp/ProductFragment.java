@@ -23,12 +23,14 @@ import com.estimote.coresdk.common.requirements.SystemRequirementsChecker;
 import com.estimote.coresdk.observation.region.beacon.BeaconRegion;
 import com.estimote.coresdk.recognition.packets.Beacon;
 import com.estimote.coresdk.service.BeaconManager;
+import com.example.userprofileapp.pojo.BeaconPojo;
 import com.example.userprofileapp.pojo.Product;
 import com.example.userprofileapp.pojo.User;
 import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -50,6 +52,9 @@ public class ProductFragment extends Fragment implements ProductAdapter.prodInte
     int product_added =0;
     private BeaconManager beaconManager;
     private BeaconRegion region;
+    private BeaconPojo currentbeacon;
+
+
     //static User User;
     SharedPreferences sharedPreferences;
 //    SharedPreferences.Editor editor;
@@ -128,21 +133,54 @@ public class ProductFragment extends Fragment implements ProductAdapter.prodInte
 
         beaconManager = new BeaconManager(getActivity());
         beaconManager.setBackgroundScanPeriod(30000L,30000L);
+
+//        beaconManager.connect(new BeaconManager.ServiceReadyCallback() {
+//            @Override
+//            public void onServiceReady() {
+//                beaconManager.startMonitoring(new BeaconRegion(
+//                        "monitored region",
+//                        UUID.fromString("B9407F30-F5F8-466E-AFF9-25556B57FE6D"),
+//                        26535, 44799));
+//            }
+//        });
+//
+//        beaconManager.setMonitoringListener(new BeaconManager.BeaconMonitoringListener() {
+//            @Override
+//            public void onEnteredRegion(BeaconRegion beaconRegion, List<Beacon> beacons) {
+//                // Do nothing
+//                Log.d("pm","Beacon entered");
+//
+//            }
+//
+//            @Override
+//            public void onExitedRegion(BeaconRegion beaconRegion) {
+//                Log.d("pm","Beacon exited");
+//
+//            }
+//        });
 // add this below:
         beaconManager.setRangingListener(new BeaconManager.BeaconRangingListener() {
 
             @Override
             public void onBeaconsDiscovered(BeaconRegion region, List<Beacon> list) {
                 if (!list.isEmpty()) {
-                    Beacon nearestBeacon = list.get(0);
-                    Log.d("pm","Beacon major and minor"+ nearestBeacon.getMajor()+" "+nearestBeacon.getMinor());
-                    try {
-                        new ProductAPI(productURL,getActivity(),prodAdapter,productList,token,nearestBeacon.getMajor(),nearestBeacon.getMinor()).execute();
-                        //   prodAdapter.notifyDataSetChanged();
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    Beacon nearestBeacon;
+                    if(list.size()>1 && currentbeacon !=null && Calendar.getInstance().getTimeInMillis()-currentbeacon.getDatetime()<10000 ){
+                        // do nothing
                     }
-                    Log.d("pm", "Nearest products: " + productList);
+                    else{
+                        nearestBeacon = list.get(0);
+                        Log.d("pm","Beacon major and minor"+ nearestBeacon.getMajor()+" "+nearestBeacon.getMinor());
+                        try {
+                            new ProductAPI(productURL,getActivity(),prodAdapter,productList,token,nearestBeacon.getMajor(),nearestBeacon.getMinor()).execute();
+                            //   prodAdapter.notifyDataSetChanged();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        Log.d("pm", "Nearest products: " + productList);
+                        currentbeacon= new BeaconPojo(nearestBeacon.getMajor(),nearestBeacon.getMinor(), Calendar.getInstance().getTimeInMillis());
+                    }
+
                 }else{
                     Log.d("pm","No beacon found");
                 }
