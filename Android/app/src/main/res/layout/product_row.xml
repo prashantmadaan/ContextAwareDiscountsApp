@@ -34,10 +34,10 @@
                 android:id="@+id/product_price"
                 android:layout_width="70dp"
                 android:layout_height="22dp"
-                android:layout_marginStart="104dp"
-                android:layout_marginTop="4dp"
+                android:layout_marginStart="2dp"
+                android:layout_marginTop="16dp"
                 android:text="TextView"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/price"
                 app:layout_constraintTop_toBottomOf="@+id/product_name" />
 
             <TextView
@@ -59,6 +59,37 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/placeholder_image" />
+
+            <TextView
+                android:id="@+id/prod_discount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:text="TextView"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/discount"
+                app:layout_constraintTop_toBottomOf="@+id/product_name"
+                app:layout_constraintVertical_bias="0.0" />
+
+            <TextView
+                android:id="@+id/discount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="84dp"
+                android:layout_marginTop="14dp"
+                android:text="@string/discount"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/product_name" />
+
+            <TextView
+                android:id="@+id/price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="23dp"
+                android:layout_marginTop="16dp"
+                android:text="@string/price"
+                app:layout_constraintStart_toEndOf="@+id/prod_discount"
+                app:layout_constraintTop_toBottomOf="@+id/product_name" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>

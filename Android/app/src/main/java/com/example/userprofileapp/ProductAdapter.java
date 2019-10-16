@@ -52,6 +52,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
         final Product product = productList.get(position);
         holder.prodName.setText(product.getProductName());
         holder.prodPrice.setText(product.getProductPrice().toString());
+        holder.prodDiscount.setText(product.getDiscount().toString());
         Picasso.get().load(product.getImageLink()).into(holder.prodImage);
         //holder.prodImage.setImageURI(product.getProductImage());
         holder.add.setOnClickListener(new View.OnClickListener() {
@@ -75,7 +76,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
-        TextView prodName,prodPrice;
+        TextView prodName,prodPrice,prodDiscount;
         ImageView prodImage;
         Button add;
 
@@ -84,6 +85,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
             prodName =itemView.findViewById(R.id.product_name);
             prodPrice = itemView.findViewById(R.id.product_price);
             prodImage = itemView.findViewById(R.id.prodImage);
+            prodDiscount = itemView.findViewById(R.id.prod_discount);
             add = itemView.findViewById(R.id.addButton);
         }
     }

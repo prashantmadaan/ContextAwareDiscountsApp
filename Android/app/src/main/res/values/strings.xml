@@ -30,4 +30,6 @@
     <string name="payButton">Checkout</string>
     <string name="addButton">Add</string>
     <string name="ipAddress">192.168.48.2</string>
+    <string name="discount">Discount:</string>
+    <string name="price">Price:</string>
 </resources>
